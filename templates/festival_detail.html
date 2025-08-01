@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ festival.name }} - Hindu Festival Details</title>
+</head>
+<body>
+    <h1>{{ festival.name }}</h1>
+    <p><strong>Date:</strong> {{ festival_date }}</p>
+    <p><strong>Details:</strong> {{ festival.details }}</p>
+
+    <div class="festival-detail-card">
+        <h2>Festival Details</h2>
+        <p><strong>📜 Tithi:</strong> {{ festival.tithi }}</p>
+        <p><strong>🌗 Paksha:</strong> {{ festival.paksha }}</p>
+        <p><strong>📅 Date:</strong> {{ festival.readable_date }}</p>
+        <p><strong>🗂 Month:</strong> {{ festival.month }}</p>
+        <p><strong>📅 Weekday:</strong> {{ festival.weekday }}</p>
+        <p><strong>🌙 Parana:</strong> {{ festival.parana or 'N/A' }}</p>
+        <p><strong>📝 Description:</strong> {{ festival.description or 'No description available.' }}</p>
+    </div>
+</body>
+</html>

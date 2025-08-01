@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekadashi Calendar</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        label, select, button {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        ul {
+            padding-left: 0;
+            list-style: none;
+        }
+        li {
+            background: #fff;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .ekadashi-date {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2980b9;
+        }
+        .ekadashi-detail {
+            margin-top: 5px;
+        }
+        .ekadashi-detail a {
+            text-decoration: none;
+            color: #2c3e50;
+        }
+        .ekadashi-detail a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ekadashi Calendar</h1>
+
+    <label for="yearSelect">Select Year:</label>
+    <select id="yearSelect"></select>
+    <button onclick="fetchEkadashi()">Show Ekadashis</button>
+
+    <ul id="ekadashiList">Please select a year to load Ekadashi dates.</ul>
+
+    <script>
+        const yearSelect = document.getElementById('yearSelect');
+        for (let y = 2023; y <= 2050; y++) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.text = y;
+            if (y === new Date().getFullYear()) opt.selected = true;
+            yearSelect.appendChild(opt);
+        }
+
+        async function fetchEkadashi() {
+            const year = document.getElementById('yearSelect').value; // define year here
+            const url = `http://127.0.0.1:5000/ekadashi?year=${year}`;
+            const list = document.getElementById('ekadashiList');
+            list.innerHTML = "Loading...";
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (!data.length) {
+                    list.innerHTML = "<li>No Ekadashi found for this year.</li>";
+                    return;
+                }
+
+                list.innerHTML = "";
+                data.forEach(e => {
+                    const item = document.createElement("li");
+                    item.innerHTML = `
+                        <div class="ekadashi-date">📅 ${e.readable_date} <br><small>(${e.iso_date})</small></div>
+                        <div class="ekadashi-detail">
+                            📜 Name: <strong>
+                                <a href="/${e.slug}-ekadashi-date-time?year=${e.iso_date.split('-')[0]}" target="_blank">
+                                    ${e.name}
+                                </a>
+                            </strong>
+                        </div>
+                        <div class="ekadashi-detail">🧘 Tithi: ${e.tithi}</div>
+                        <div class="ekadashi-detail">🌌 Nakshatra: ${e.nakshatra}</div>
+                        <div class="ekadashi-detail">🌓 Paksha: ${e.paksha} (${e.month})</div>
+                    `;
+                    list.appendChild(item);
+                });
+
+            } catch (error) {
+                console.error(error);
+                list.innerHTML = "<li>Error loading data.</li>";
+            }
+        }
+
+        window.onload = fetchEkadashi;
+    </script>
+</body>
+</html>

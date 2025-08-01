@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hindu Festivals Calendar</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #fdfcff;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4B0082;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        select, button {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin: 0 10px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #4B0082;
+            color: white;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #360060;
+        }
+
+        .day-group {
+            margin: 30px auto;
+            max-width: 800px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .day-group h2 {
+            margin-top: 0;
+            color: #222;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .festival-card {
+            background: #f9f9ff;
+            border-left: 4px solid #4B0082;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            transition: transform 0.2s ease;
+            display: table-cell;
+        }
+
+        .festival-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .festival-card h3 {
+            margin: 0 0 6px;
+            font-size: 18px;
+            color: #2d2d2d;
+        }
+
+        .festival-card p {
+            margin: 3px 0;
+            font-size: 14px;
+            color: #444;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #eee;
+            padding: 2px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .tag.vrat {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .tag.festival {
+            background-color: #e0f7ff;
+            color: #0369a1;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #888;
+            font-size: 16px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🪔 Hindu Festival Calendar</h1>
+
+    <div class="controls">
+        <select id="month">
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
+
+        <select id="year">
+            <script>
+                for (let y = 2024; y <= 2030; y++) {
+                    document.write(`<option value="${y}">${y}</option>`);
+                }
+            </script>
+        </select>
+
+        <button onclick="fetchFestivals()">Show Festivals</button>
+    </div>
+
+    <div id="festivalList">
+        <p class="no-data">Select month & year to view festivals.</p>
+    </div>
+
+    <script>
+        // Function to generate the festival slug dynamically
+        function generateSlug(festivalName) {
+            return festivalName
+                .toLowerCase()                        // Convert to lowercase
+                .replace(/\s+/g, '-')                  // Replace spaces with hyphens
+                .replace(/[^\w\-]+/g, '')              // Remove non-alphanumeric characters
+                .replace(/\-\-+/g, '-')                // Replace multiple hyphens with one
+                .replace(/^-+/, '')                    // Remove leading hyphens
+                .replace(/-+$/, '');                   // Remove trailing hyphens
+        }
+
+        async function fetchFestivals() {
+            const month = document.getElementById("month").value;
+            const year = document.getElementById("year").value;
+            const date = `${year}-${month}-01`;
+
+            const res = await fetch(`http://127.0.0.1:5000/festivals?date=${date}`);
+            const data = await res.json();
+            const festivals = data.festivals;
+
+            const container = document.getElementById("festivalList");
+            container.innerHTML = "";
+
+            if (!festivals || festivals.length === 0) {
+                container.innerHTML = "<p class='no-data'>No festivals found for this month.</p>";
+                return;
+            }
+
+            festivals.forEach(f => {
+                const festivalSlug = generateSlug(f.name);  // Dynamically generate the slug
+                const festivalDate = f.date;  // Use the date for the festival
+
+                const festivalUrl = `/${festivalSlug}-date-time?date=${festivalDate}`;
+
+                const card = document.createElement("div");
+                card.className = "festival-card";
+                card.innerHTML = `
+                    <h3><a href="${festivalUrl}">${f.name}</a></h3>
+                    <p><strong>📜 Tithi:</strong> ${f.tithi}</p>
+                    <p><strong>🌗 Paksha:</strong> ${f.paksha}</p>
+                    <p><strong>🗂 Month:</strong> ${f.month}</p>
+                    <p><strong>📅 Day:</strong> ${f.weekday || 'Unknown'}</p>
+                    ${f.parana ? `<p><strong>🕐 Parana:</strong> ${f.parana}</p>` : ""}
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

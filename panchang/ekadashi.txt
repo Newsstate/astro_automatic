@@ -1,0 +1,26 @@
+import datetime
+from panchang.calculator import calculate_panchang
+
+def is_ekadashi(panchang_data):
+    return panchang_data["tithi"]["name"].startswith("Ekadashi")
+
+def generate_ekadashi_dates(start_year, end_year):
+    ekadashi_list = []
+
+    for year in range(start_year, end_year + 1):
+        date = datetime.date(year, 1, 1)
+        end_date = datetime.date(year, 12, 31)
+
+        while date <= end_date:
+            data = calculate_panchang(date.year, date.month, date.day)
+            if is_ekadashi(data):
+                ekadashi_list.append({
+                    "date": date.strftime("%Y-%m-%d"),
+                    "weekday": data["weekday"],
+                    "tithi": data["tithi"]["name"],
+                    "nakshatra": data["nakshatra"]["name"],
+                    "paksha": data["paksha"]
+                })
+            date += datetime.timedelta(days=1)
+
+    return ekadashi_list

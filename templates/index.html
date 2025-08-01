@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daily Panchang</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    #output {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      font-size: 16px;
+      line-height: 1.6;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Get Daily Panchang</h1>
+  <input type="date" id="dateInput" value="2050-08-22">
+  <button onclick="fetchPanchang()">Fetch Panchang</button>
+  <div id="output">Select a date and click the button to view Panchang.</div>
+
+  <script>
+    async function fetchPanchang() {
+      const selectedDate = document.getElementById('dateInput').value;
+      if (!selectedDate) {
+        document.getElementById('output').textContent = "Please select a date.";
+        return;
+      }
+
+      const url = `http://127.0.0.1:5000/panchang?date=${selectedDate}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("API error");
+        const data = await response.json();
+
+        const output = `
+📅 Date: ${data.date}
+🌅 Sunrise: ${data.sunrise}
+🌇 Sunset: ${data.sunset}
+
+📆 Tithi: ${data.tithi.name} → Ends at ${data.tithi.ends}
+🌌 Nakshatra: ${data.nakshatra.name} → Ends at ${data.nakshatra.ends}
+🧘 Yoga: ${data.yoga.name} → Ends at ${data.yoga.ends}
+♻️ Karana 1: ${data.karana[0].name} → Ends at ${data.karana[0].ends}
+♻️ Karana 2: ${data.karana[1].name} → Ends at ${data.karana[1].ends}
+
+🌓 Paksha: ${data.paksha}
+📅 Weekday: ${data.weekday}
+
+🌙 Moonsign: ${data.moonsign}
+🌞 Sunsign: ${data.sunsign}
+
+📜 Amanta Month: ${data.month.amanta}
+📜 Purnimanta Month: ${data.month.purnimanta}
+
+📅 Shaka Samvat: ${data.shaka_samvat}
+📅 Vikram Samvat: ${data.vikram_samvat}
+📅 Gujarati Samvat: ${data.gujarati_samvat}
+        `.trim();
+
+        document.getElementById('output').textContent = output;
+      } catch (error) {
+        document.getElementById('output').textContent = "Error fetching Panchang.";
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
