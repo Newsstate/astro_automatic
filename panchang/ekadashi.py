@@ -1,9 +1,8 @@
-from datetime import datetime, timedelta, time
-import pytz
+import re
+from datetime import timedelta, date, datetime
+from panchang.calculator import calculate_panchang
 
-from panchang.core import get_tithi_at_sunrise
-
-
+# Ekadashi Name Lookup (Purnimanta system)
 EKADASHI_NAME_MAP = {
     "Chaitra-Shukla": "Kamada Ekadashi",
     "Chaitra-Krishna": "Papmochani Ekadashi",
@@ -18,60 +17,67 @@ EKADASHI_NAME_MAP = {
     "Bhadrapada-Shukla": "Parivartini Ekadashi",
     "Bhadrapada-Krishna": "Indira Ekadashi",
     "Ashwin-Shukla": "Papankusha Ekadashi",
-    "Ashwin-Krishna": "Rama Ekadashi",
+    "Ashwin-Krishna": "Pasankusha Ekadashi",
     "Kartika-Shukla": "Prabodhini Ekadashi",
     "Kartika-Krishna": "Rama Ekadashi",
     "Margashirsha-Shukla": "Mokshada Ekadashi",
     "Margashirsha-Krishna": "Utpanna Ekadashi",
-    "Pausha-Shukla": "Pausha Putrada Ekadashi",
+    "Pausha-Shukla": "Putrada Ekadashi",
     "Pausha-Krishna": "Saphala Ekadashi",
     "Magha-Shukla": "Shattila Ekadashi",
-    "Magha-Krishna": "Jaya Ekadashi",
+    "Magha-Krishna": "Katyayani Ekadashi",
     "Phalguna-Shukla": "Amalaki Ekadashi",
-    "Phalguna-Krishna": "Vijaya Ekadashi"
+    "Phalguna-Krishna": "Vijaya Ekadashi",
+    "Adhika-Shukla": "Padmini Ekadashi",
+    "Adhika-Krishna": "Parama Ekadashi",
 }
 
-def get_ekadashi_name(month, paksha):
-    return EKADASHI_NAME_MAP.get(f"{month}-{paksha}", "Ekadashi")
+def get_ekadashi_name(lunar_month, paksha):
+    key = f"{lunar_month}-{paksha}"
+    return EKADASHI_NAME_MAP.get(key, "Ekadashi")
 
-def get_parana_details(ekadashi_date):
+def get_parana_time(ekadashi_date):
     next_day = ekadashi_date + timedelta(days=1)
-    details = get_tithi_at_sunrise(next_day.year, next_day.month, next_day.day)
+    panchang = calculate_panchang(next_day.year, next_day.month, next_day.day)
     return {
         "parana_date": next_day.isoformat(),
-        "sunrise": "06:00 AM",
-        "dwadashi_tithi": details["tithi"],
-        "paksha": details["paksha"]
+        "sunrise": panchang["sunrise"],
+        "tithi": panchang["tithi"]["name"],
+        "paksha": panchang["paksha"]
     }
+
+def generate_slug(name):
+    return re.sub(r'[^\w\s-]', '', name).lower().replace(" ", "-")
+
+def calculate_ekadashi_span_mock(ekadashi_date):
+    start_dt = datetime.combine(ekadashi_date, datetime.min.time()).replace(hour=21, minute=26) - timedelta(days=1)
+    end_dt = datetime.combine(ekadashi_date, datetime.min.time()).replace(hour=20, minute=15)
+    return start_dt, end_dt
+
+def format_datetime_range(start_dt, end_dt):
+    return f"Begins - {start_dt.strftime('%I:%M %p, %b %d')}\nEnds - {end_dt.strftime('%I:%M %p, %b %d')}"
 
 def find_ekadashis(start_date, end_date):
     ekadashis = []
-    current_date = start_date
-
-    while current_date <= end_date:
-        sunrise_dt = datetime.combine(current_date, time(6, 0))
-        tithi_info = get_tithi_at_sunrise(sunrise_dt.year, sunrise_dt.month, sunrise_dt.day)
-
-        if tithi_info["tithi"]["name"] == "Ekadashi":
-            month = tithi_info["month"]["purnimanta"]
-            paksha = tithi_info["paksha"]
-            name = get_ekadashi_name(month, paksha)
-            slug = name.lower().replace(" ", "-").replace("’", "").replace("'", "")
-            parana = get_parana_details(current_date)
-
-            ekadashis.append({
-                "readable_date": current_date.strftime("%B %d, %Y, %A"),
-                "iso_date": current_date.isoformat(),
+    current = start_date
+    while current <= end_date:
+        p = calculate_panchang(current.year, current.month, current.day)
+        if p["tithi"]["name"] == "Ekadashi":
+            name = get_ekadashi_name(p["month"]["purnimanta"], p["paksha"])
+            start_dt, end_dt = calculate_ekadashi_span_mock(current)
+            ek = {
                 "name": name,
-                "slug": slug,
-                "weekday": current_date.strftime("%A"),
+                "slug": generate_slug(name),
+                "iso_date": current.isoformat(),
+                "readable_date": current.strftime("%B %d, %Y"),
                 "tithi": "Ekadashi",
-                "nakshatra": tithi_info.get("nakshatra", ""),
-                "paksha": paksha,
-                "month": month,
-                "parana": parana
-            })
-
-        current_date += timedelta(days=1)
-
+                "weekday": p["weekday"],
+                "nakshatra": p["nakshatra"]["name"],
+                "paksha": p["paksha"],
+                "month": p["month"]["purnimanta"],
+                "parana": get_parana_time(current),
+                "start_time": format_datetime_range(start_dt, end_dt),
+            }
+            ekadashis.append(ek)
+        current += timedelta(days=1)
     return ekadashis
