@@ -115,22 +115,26 @@ def ekadashi_route():
 def show_ekadashi_page():
     return render_template("ekadashi.html")
 
-@app.route("/<slug>-ekadashi-date-time")
+@app.route("/ekadashi/<slug>-date-time")
 def ekadashi_detail(slug):
-    year = request.args.get('year')
-    
+    year = request.args.get("year")
     if not year or not year.isdigit():
         return "Invalid or missing year parameter", 400
 
     year = int(year)
-
-    # Fetch the Ekadashi details from your data source based on the slug
+    
+    # Correct usage of date
     all_ekadashis = find_ekadashis(date(year, 1, 1), date(year, 12, 31))
 
-    ekadashi = next((e for e in all_ekadashis if generate_slug(e['name']) == slug), None)
+    ek = next((e for e in all_ekadashis if e['slug'] == slug), None)
 
-    if ekadashi is None:
+    if not ek:
         return f"Ekadashi with slug '{slug}' not found for {year}", 404
+
+    ek_date = date.fromisoformat(ek["iso_date"])
+    panchang = calculate_panchang(ek_date.year, ek_date.month, ek_date.day)
+
+    return render_template("ekadashi_detail.html", ekadashi=ek, panchang=panchang)
 
     # Calculate panchang details for the Ekadashi
     ekadashi_date = date.fromisoformat(ekadashi["iso_date"])
