@@ -24,7 +24,7 @@ def to_local_time(jd, tz='Asia/Kolkata'):
 
 def get_purnimanta_month(sun_long):
     index = int((sun_long % 360) / 30)
-    return LUNAR_MONTHS[(index + 1) % 12]
+    return LUNAR_MONTHS[(index + 0) % 12]
 
 def get_amanta_month(sun_long):
     index = int((sun_long % 360) / 30)
