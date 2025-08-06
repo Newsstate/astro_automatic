@@ -19,7 +19,7 @@ def get_tithi_name(index):
     return names[index % 15]
 
 def get_purnimanta_month(sun_long):
-    solar_index = int((sun_long + 15) % 360 / 30)
+    solar_index = int((sun_long + 1) % 360 / 30)
     return LUNAR_MONTHS[solar_index]
 
 def calculate_panchang(year, month, day, hour=6, minute=0, latitude=28.6139, longitude=77.2090):
