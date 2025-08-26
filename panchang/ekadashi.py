@@ -4,32 +4,33 @@ from panchang.calculator import calculate_panchang
 
 # Ekadashi Name Lookup (Purnimanta system)
 EKADASHI_NAME_MAP = {
-    "Chaitra-Shukla": "Kamada Ekadashi",
-    "Chaitra-Krishna": "Papmochani Ekadashi",
-    "Vaishakha-Shukla": "Mohini Ekadashi",
-    "Vaishakha-Krishna": "Apara Ekadashi",
-    "Jyeshtha-Shukla": "Nirjala Ekadashi",
-    "Jyeshtha-Krishna": "Yogini Ekadashi",
-    "Ashadha-Shukla": "Devshayani Ekadashi",
-    "Ashadha-Krishna": "Kamika Ekadashi",
-    "Shravana-Shukla": "Putrada Ekadashi",
-    "Shravana-Krishna": "Aja Ekadashi",
-    "Bhadrapada-Shukla": "Parivartini Ekadashi",
-    "Bhadrapada-Krishna": "Indira Ekadashi",
-    "Ashwin-Shukla": "Papankusha Ekadashi",
-    "Ashwin-Krishna": "Pasankusha Ekadashi",
-    "Kartika-Shukla": "Prabodhini Ekadashi",
-    "Kartika-Krishna": "Rama Ekadashi",
-    "Margashirsha-Shukla": "Mokshada Ekadashi",
-    "Margashirsha-Krishna": "Utpanna Ekadashi",
-    "Pausha-Shukla": "Putrada Ekadashi",
-    "Pausha-Krishna": "Saphala Ekadashi",
-    "Magha-Shukla": "Shattila Ekadashi",
-    "Magha-Krishna": "Katyayani Ekadashi",
-    "Phalguna-Shukla": "Amalaki Ekadashi",
-    "Phalguna-Krishna": "Vijaya Ekadashi",
-    "Adhika-Shukla": "Padmini Ekadashi",
-    "Adhika-Krishna": "Parama Ekadashi",
+    "Chaitra-Shukla": "कामदा एकादशी",
+"Chaitra-Krishna": "पापमोचनी एकादशी",
+"Vaishakha-Shukla": "मोहिनी एकादशी",
+"Vaishakha-Krishna": "अपरा एकादशी",
+"Jyeshtha-Shukla": "निर्जला एकादशी",
+"Jyeshtha-Krishna": "योगिनी एकादशी",
+"Ashadha-Shukla": "देवशयनी एकादशी",
+"Ashadha-Krishna": "कामिका एकादशी",
+"Shravana-Shukla": "पुत्रदा एकादशी",
+"Shravana-Krishna": "अजा एकादशी",
+"Bhadrapada-Shukla": "परिवर्तिनी एकादशी",
+"Bhadrapada-Krishna": "इन्दिरा एकादशी",
+"Ashwin-Shukla": "पापांकुशा एकादशी",
+"Ashwin-Krishna": "पसांकुशा एकादशी",
+"Kartika-Shukla": "प्रबोधिनी एकादशी",
+"Kartika-Krishna": "रमा एकादशी",
+"Margashirsha-Shukla": "मोक्षदा एकादशी",
+"Margashirsha-Krishna": "उत्पन्ना एकादशी",
+"Pausha-Shukla": "पुत्रदा एकादशी",
+"Pausha-Krishna": "सफल एकादशी",
+"Magha-Shukla": "षट्तिला एकादशी",
+"Magha-Krishna": "कात्यायनी एकादशी",
+"Phalguna-Shukla": "आमलकी एकादशी",
+"Phalguna-Krishna": "विजया एकादशी",
+"Adhika-Shukla": "पद्मिनी एकादशी",
+"Adhika-Krishna": "परमा एकादशी"
+
 }
 
 def get_ekadashi_name(lunar_month, paksha):
@@ -81,3 +82,4 @@ def find_ekadashis(start_date, end_date):
             ekadashis.append(ek)
         current += timedelta(days=1)
     return ekadashis
+
