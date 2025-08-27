@@ -166,7 +166,7 @@
             const year = document.getElementById("year").value;
             const date = `${year}-${month}-01`;
 
-            const res = await fetch(`http://127.0.0.1:5000/festivals?date=${date}`);
+            const res = await fetch(`https://astro-automatic.onrender.com//festivals?date=${date}`);
             const data = await res.json();
             const festivals = data.festivals;
 
@@ -200,3 +200,4 @@
     </script>
 </body>
 </html>
+
