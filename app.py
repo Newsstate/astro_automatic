@@ -31,22 +31,37 @@ def get_festival_by_slug(slug, festival_date):
 
     return festival
 
-# Route for festival details page
+from flask import Flask, render_template, request, abort
+from datetime import datetime
+
+app = Flask(__name__)
+
 @app.route("/<slug>-date-time")
 def festival_detail(slug):
     festival_date = request.args.get("date")
     
     if not festival_date:
-        return "Invalid or missing date parameter", 400
+        return abort(400, description="Missing date parameter")
 
-    # Fetch the festival using the festival name (slug) and date dynamically
-    festival = get_festival_by_slug(slug, festival_date)
+    # ✅ Validate date format (YYYY-MM-DD expected)
+    try:
+        parsed_date = datetime.strptime(festival_date, "%Y-%m-%d").date()
+    except ValueError:
+        return abort(400, description="Invalid date format. Use YYYY-MM-DD")
+
+    # Fetch the festival from your database/service
+    festival = get_festival_by_slug(slug, parsed_date)
 
     if festival is None:
-        return f"Festival with name '{slug}' and date '{festival_date}' not found", 404
+        return abort(404, description=f"Festival '{slug}' on {festival_date} not found")
 
-    # Render festival detail page with the festival data
-    return render_template("festival_detail.html", festival=festival, festival_date=festival_date)
+    # Render template with context
+    return render_template(
+        "festival_detail.html",
+        festival=festival,
+        festival_date=parsed_date
+    )
+
 
 # Route to show the festivals UI page
 @app.route("/festivals-ui")
