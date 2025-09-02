@@ -41,7 +41,10 @@ def calculate_panchang(year, month, day, hour=6, minute=0, latitude=28.6139, lon
         "month": {
             "purnimanta": month_name
         }
+                "weekday": weekday  # Add the calculated weekday to the dictionary
+
     }
 
 def get_tithi_at_sunrise(year, month, day):
     return calculate_panchang(year, month, day, hour=6, minute=0)
+
