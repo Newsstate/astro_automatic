@@ -27,7 +27,11 @@ def calculate_panchang(year, month, day, hour=6, minute=0, latitude=28.6139, lon
     jd = swe.julday(year, month, day, hour + minute / 60.0)
     sun_long = swe.calc_ut(jd, swe.SUN)[0][0]
     moon_long = swe.calc_ut(jd, swe.MOON)[0][0]
-    
+
+    # Calculate weekday here
+    date_obj = datetime.date(year, month, day)
+    weekday = date_obj.strftime("%A")
+
     tithi_num = int(((moon_long - sun_long) % 360) / TITHI_SIZE)
     paksha = "Shukla" if tithi_num < 15 else "Krishna"
     month_name = get_purnimanta_month(sun_long)
@@ -40,11 +44,11 @@ def calculate_panchang(year, month, day, hour=6, minute=0, latitude=28.6139, lon
         "paksha": paksha,
         "month": {
             "purnimanta": month_name
-        }
-                "weekday": weekday  # Add the calculated weekday to the dictionary
-
+        },
+        "weekday": weekday  # Add the calculated weekday to the dictionary
     }
 
 def get_tithi_at_sunrise(year, month, day):
     return calculate_panchang(year, month, day, hour=6, minute=0)
+
 
