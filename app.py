@@ -6,9 +6,23 @@ from panchang.festivals import calculate_festivals
 from panchang.festival_calculator import calculate_festival_days
 from datetime import datetime, date
 
+# --- CORS Configuration ---
+# Including all potential frontend domains (www/non-www and the domain from the original error)
+allowed_origins = [
+    "https://www.asthaguru.com",
+    "https://asthaguru.com",
+    "https://www.khabar24live.com",
+    "https://khabar24live.com",
+    # If the widget is being tested locally, you might also add:
+    # "http://localhost:port_number"
+]
+
 # Initialize the Flask app and enable CORS
 app = Flask(__name__, template_folder="templates", static_folder="static")
-CORS(app, origins="https://www.asthaguru.com")
+CORS(app, 
+     origins=allowed_origins,
+     supports_credentials=True # Needed if you ever use cookies/sessions
+)
 
 # --- Helper Functions ---
 def generate_slug(festival_name):
@@ -22,6 +36,7 @@ def get_festival_by_slug(slug, festival_date):
     Consider caching or a database for production.
     """
     # Adjust date range as needed for the lookup
+    # Using a simplified 2024 range for demonstration
     all_festivals = calculate_festival_days(date(2024, 1, 1), date(2024, 12, 31))
     
     # Match festival by both slug (festival name) and date
@@ -75,7 +90,13 @@ def get_panchang():
         except ValueError:
             return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
 
-    result = calculate_panchang(today.year, today.month, today.day)
+    # Ensure the panchang calculation function is available in your environment
+    try:
+        result = calculate_panchang(today.year, today.month, today.day)
+    except Exception as e:
+        # In a real app, you'd log the full error, but for the user:
+        return jsonify({"error": f"Panchang calculation failed on the server: {str(e)}"}), 500
+
     return jsonify(result)
 
 @app.route("/festivals", methods=["GET"])
